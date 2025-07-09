@@ -1,0 +1,11 @@
+services:
+  web:
+    build: .
+    container_name: rag-nextjs
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env.local
