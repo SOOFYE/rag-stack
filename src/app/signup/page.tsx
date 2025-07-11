@@ -4,9 +4,10 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
-import { signUpWithEmail, signInWithGitHub } from '@/lib/auth';
 import ClipLoader from 'react-spinners/ClipLoader';
 import Image from 'next/image';
+import { supabaseBrowserClient } from '../../../utils/supabase/client';
+import { useAuth } from '../../context/AuthContext';
 
 
 type FormData = {
@@ -18,23 +19,53 @@ export default function SignUp() {
   const router = useRouter();
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
   const [loading, setLoading] = React.useState(false);
+  const { setUser } = useAuth()
+
+
+  async function signUpWithEmail(email: string, password: string) {
+    const res = await fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to sign up');
+    return data;
+  }
+
+    const handleGitHub = async () => {
+    return await supabaseBrowserClient.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+  };
 
   const onSubmit = async ({ email, password }: FormData) => {
-    setLoading(true);
-    const { error } = await signUpWithEmail(email, password);
-    setLoading(false);
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success('Signed up successfully!');
-      setTimeout(() => router.push('/'), 1500); 
+    setLoading(true)
+    try {
+      const { error } = await signUpWithEmail(email, password)
+      if (error) {
+        throw error
+      }
+      const res = await fetch('/api/auth/user')
+      const { user } = await res.json()
+      setUser(user)
+      toast.success('Signed up successfully!')
+      router.push('/chat')
+    } catch (err: any) {
+      toast.error(err.message)
+    } finally {
+      setLoading(false)
     }
-  };
+  }
 
-  const handleGitHub = async () => {
-    const { error } = await signInWithGitHub();
-    if (error) toast.error(error.message);
-  };
+
+
+
+
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -50,12 +81,13 @@ export default function SignUp() {
             <input
               type="text"
               placeholder="Email"
-              {...register('email', { 
+              {...register('email', {
                 required: 'Email is required',
                 pattern: {
                   value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                   message: 'Enter a valid email address',
-                }, })}
+                },
+              })}
               className="w-full px-4 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-black-500 font-[family-name:var(--font-geist-mono)]"
             />
             {errors.email && (
@@ -86,9 +118,8 @@ export default function SignUp() {
             <button
               type="submit"
               disabled={loading}
-              className={`cursor-pointer rounded-full border border-transparent transition-colors flex items-center justify-center bg-black text-white gap-2 hover:bg-[#383838] font-bold text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-20 sm:w-auto ${
-                loading ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+              className={`cursor-pointer rounded-full border border-transparent transition-colors flex items-center justify-center bg-black text-white gap-2 hover:bg-[#383838] font-bold text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-20 sm:w-auto ${loading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
             >
               {loading ? (
                 <>
