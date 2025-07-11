@@ -4,9 +4,10 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
-import { signInWithEmail, signInWithGitHub } from '@/lib/auth';
 import ClipLoader from 'react-spinners/ClipLoader';
 import Image from 'next/image';
+import { supabaseBrowserClient } from '../../../utils/supabase/client';
+import { useAuth } from '../../context/AuthContext';
 
 type FormData = {
   email: string;
@@ -17,22 +18,44 @@ export default function LogIn() {
   const router = useRouter();
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
   const [loading, setLoading] = React.useState(false);
+  const { setUser } = useAuth()
 
-  const onSubmit = async ({ email, password }: FormData) => {
+ async function signInWithEmail(email: string, password: string) {
+  const res = await fetch('/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+
+  const data = await res.json();
+  console.log(data.error)
+  if (!res.ok) throw new Error(data.error || 'Failed to log in');
+  return data;
+}
+
+const onSubmit = async ({ email, password }: FormData) => {
+  try {
     setLoading(true);
-    const { error } = await signInWithEmail(email, password);
+    await signInWithEmail(email, password);
+    const res = await fetch('/api/auth/user')
+    const { user } = await res.json()
+    setUser(user)
+    toast.success('Logged in successfully!');
+    router.push('/chat')
+  } catch (error: any) {
+    toast.error(error.message);
+  } finally {
     setLoading(false);
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success('Logged in successfully!');
-      setTimeout(() => router.push('/'), 1500);
-    }
-  };
+  }
+};
 
   const handleGitHub = async () => {
-    const { error } = await signInWithGitHub();
-    if (error) toast.error(error.message);
+    return await supabaseBrowserClient.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
   };
 
   return (
