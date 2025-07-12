@@ -1,0 +1,1 @@
+export const REDIS_URL: string = process.env.REDIS_URL as string
