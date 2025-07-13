@@ -30,8 +30,8 @@ export default function ChatPage() {
         </div>
 
         <div className="bg-white/20 border border-white/30 backdrop-blur-md rounded-lg p-6 shadow hover:shadow-lg transition text-center">
-          <h3 className="text-lg font-semibold mb-2">Multi-file Chat</h3>
-          <p className="text-sm text-black">Chat with multiple files at once.</p>
+          <h3 className="text-lg font-semibold mb-2">Source backed</h3>
+          <p className="text-sm text-black">Get your sources for your response.</p>
         </div>
       </div>
     </div>
