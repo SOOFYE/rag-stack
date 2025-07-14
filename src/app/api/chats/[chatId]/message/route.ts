@@ -11,7 +11,8 @@ const bodySchema = z.object({
 })
 
 export async function POST(req: Request, context: { params: { chatId: string } }) {
-  const chatId = context.params.chatId
+  const { params } =  context;
+  const chatId = params.chatId;
   const json = await req.json()
   const body = bodySchema.safeParse(json)
 
