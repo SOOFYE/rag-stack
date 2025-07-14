@@ -1,16 +1,30 @@
-# --- Dockerfile ---
 FROM node:20-alpine
 
+# Accept Supabase secrets as build arguments
+ARG SUPABASE_URL
+ARG SUPABASE_ANON_KEY
+
+# Make them available as env vars during build
+ENV SUPABASE_URL=$SUPABASE_URL
+ENV SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY
+
+# Set working directory
 WORKDIR /app
 
-# Copy and install dependencies
-COPY package.json package-lock.json* ./
-RUN npm install --production
+# Install OS deps if needed (for PDF, etc.)
+RUN apk add --no-cache libc6-compat python3 make g++ && npm i -g pnpm
 
-# Copy the rest of the app (including src/, public/, etc.)
+# Copy dependency manifests
+COPY package.json package-lock.json* ./
+
+# Install all deps (not just prod)
+RUN npm install
+
+# Copy source code
 COPY . .
 
-# Expose port
+# Expose Next.js dev port
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]
+# Start the dev server for web, socket, and worker in parallel
+CMD ["sh", "-c", "npm run dev & npm run start:worker & npm run start:socket && wait"]

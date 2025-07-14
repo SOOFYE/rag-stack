@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react'
 import { Dashboard } from '@uppy/react'
 import '@uppy/core/dist/style.min.css'
 import '@uppy/dashboard/dist/style.min.css'
-import { useUppyWithSupabase } from '@/hooks/useUppyWithSupabase'
+
 import { toast } from 'react-toastify'
 import {socket} from '../../../../../utils/sockets/socket'
+import { useUppyWithSupabase } from '../../../../hooks/useUppyWithSupabase'
 
 type UploadedFile = {
   name: string

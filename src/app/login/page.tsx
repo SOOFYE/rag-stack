@@ -50,12 +50,13 @@ const onSubmit = async ({ email, password }: FormData) => {
 };
 
   const handleGitHub = async () => {
-    return await supabaseBrowserClient.auth.signInWithOAuth({
+    await supabaseBrowserClient.auth.signInWithOAuth({
         provider: 'github',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
+        options:{
+           redirectTo: `${window.location.origin}/auth/callback`
+        }
       });
+      // router.push('/auth/callback')
   };
 
   return (
@@ -138,10 +139,6 @@ const onSubmit = async ({ email, password }: FormData) => {
             <Image className='invert' src="/github.png" alt="GitHub" width={20} height={20} />
             GitHub
           </button>
-        </div>
-
-        <div className="mt-6 text-center text-sm text-gray-500 font-[family-name:var(--font-geist-mono)]">
-          <a href="#" className="hover:underline">Forget Password?</a>
         </div>
 
         <div className="mt-2 text-center text-sm text-gray-600 font-[family-name:var(--font-geist-mono)]">

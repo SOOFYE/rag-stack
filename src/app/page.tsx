@@ -69,14 +69,6 @@ export default function Home() {
         </div>
       </section>
 
-
-
-
-      <section className="text-center my-12">
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded text-lg font-semibold">
-          Try for Free
-        </button>
-      </section>
     </div>
   );
 }

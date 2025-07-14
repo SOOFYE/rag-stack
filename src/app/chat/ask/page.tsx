@@ -1,7 +1,7 @@
 'use client'
 
 import { useSearchParams, useRouter } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
@@ -18,9 +18,9 @@ type Message = {
 export default function ChatViewPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const initialChatId = searchParams.get('chatId')
+  const chatId = searchParams.get('chatId')
 
-  const [chatId, setChatId] = useState<string | null>(initialChatId)
+
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -62,8 +62,8 @@ export default function ChatViewPage() {
         const res = await fetch('/api/chats', { method: 'POST' })
         const data = await res.json()
         newChatId = data.chatId
-        if (!newChatId) throw new Error('Failed to create chat')
-        setChatId(newChatId)
+        if (!newChatId) throw new Error('Failed to create chat');
+        
         router.replace(`/chat/ask?chatId=${newChatId}`)
       }
 
@@ -97,7 +97,7 @@ export default function ChatViewPage() {
   }
 
   return (
-    <div className="flex flex-col  max-w-4xl mx-auto px-4 pt-6">
+    <Suspense fallback={<div>Loading chat...</div>}><div className="flex flex-col  max-w-4xl mx-auto px-4 pt-6">
       <div className="flex-1 overflow-y-auto space-y-6 pb-32">
         {messages.map((msg) => (
           <div
@@ -105,44 +105,43 @@ export default function ChatViewPage() {
             className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
           >
             <div
-              className={`relative max-w-[80%] px-4 py-3 rounded-xl shadow-md whitespace-pre-wrap text-sm leading-relaxed ${
-                msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-white'
-              }`}
+              className={`relative max-w-[80%] px-4 py-3 rounded-xl shadow-md whitespace-pre-wrap text-sm leading-relaxed ${msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-white'
+                }`}
             >
               {msg.role === 'assistant' ? (
                 <ReactMarkdown
-  components={{
-    code({
-      inline,
-      className,
-      children,
-      ...props
-    }: {
-      inline?: boolean
-      className?: string
-      children?: React.ReactNode
-    }) {
-      const match = /language-(\w+)/.exec(className || '')
-      return !inline && match ? (
-        <SyntaxHighlighter
-          language={match[1]}
-          style={oneDark}
-          PreTag="div"
-          customStyle={{ borderRadius: '0.5rem', padding: '1rem' }}
-          {...props}
-        >
-          {String(children).replace(/\n$/, '')}
-        </SyntaxHighlighter>
-      ) : (
-        <code className="bg-gray-700 px-1 py-0.5 rounded" {...props}>
-          {children}
-        </code>
-      )
-    },
-  }}
->
-  {msg.content}
-</ReactMarkdown>
+                  components={{
+                    code({
+                      inline,
+                      className,
+                      children,
+                      ...props
+                    }: {
+                      inline?: boolean
+                      className?: string
+                      children?: React.ReactNode
+                    }) {
+                      const match = /language-(\w+)/.exec(className || '')
+                      return !inline && match ? (
+                        <SyntaxHighlighter
+                          language={match[1]}
+                          style={oneDark}
+                          PreTag="div"
+                          customStyle={{ borderRadius: '0.5rem', padding: '1rem' }}
+                          {...props}
+                        >
+                          {String(children).replace(/\n$/, '')}
+                        </SyntaxHighlighter>
+                      ) : (
+                        <code className="bg-gray-700 px-1 py-0.5 rounded" {...props}>
+                          {children}
+                        </code>
+                      )
+                    },
+                  }}
+                >
+                  {msg.content}
+                </ReactMarkdown>
               ) : (
                 msg.content
               )}
@@ -199,6 +198,6 @@ export default function ChatViewPage() {
           </button>
         </div>
       </div>
-    </div>
+    </div></Suspense>
   )
 }

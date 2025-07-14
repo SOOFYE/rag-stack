@@ -25,8 +25,8 @@ export default function ChatPage() {
         </div>
 
         <div className="bg-white/20 border border-white/30 backdrop-blur-md rounded-lg p-6 shadow hover:shadow-lg transition text-center">
-          <h3 className="text-lg font-semibold mb-2">Single File Chat</h3>
-          <p className="text-sm text-black">Start a new chat with a file of your choice.</p>
+          <h3 className="text-lg font-semibold mb-2">Chat</h3>
+          <p className="text-sm text-black">Start a new chat with files you have uploaded.</p>
         </div>
 
         <div className="bg-white/20 border border-white/30 backdrop-blur-md rounded-lg p-6 shadow hover:shadow-lg transition text-center">

@@ -1,6 +1,12 @@
+version: '3.9'
+
 services:
   web:
-    build: .
+    build:
+      context: .
+      args:
+        SUPABASE_URL: ${SUPABASE_URL}
+        SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
     container_name: rag-nextjs
     ports:
       - '3000:3000'
@@ -8,4 +14,47 @@ services:
       - .:/app
       - /app/node_modules
     env_file:
-      - .env.local
+      - .env
+    depends_on:
+      - redis
+    command: npm run dev
+
+  worker:
+    build:
+      context: .
+      args:
+        SUPABASE_URL: ${SUPABASE_URL}
+        SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+    container_name: rag-worker
+    command: npm run start:worker
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    depends_on:
+      - redis
+
+  socket:
+    build:
+      context: .
+      args:
+        SUPABASE_URL: ${SUPABASE_URL}
+        SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+    container_name: rag-socket
+    command: npm run start:socket
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    ports:
+      - '3001:3001'
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    container_name: rag-redis
+    ports:
+      - '6379:6379'

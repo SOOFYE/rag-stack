@@ -34,13 +34,11 @@ export default function SignUp() {
     return data;
   }
 
-    const handleGitHub = async () => {
-    return await supabaseBrowserClient.auth.signInWithOAuth({
-      provider: 'github',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
+const handleGitHub = async () => {
+    await supabaseBrowserClient.auth.signInWithOAuth({
+        provider: 'github',
+      });
+      router.push('/auth/callback')
   };
 
   const onSubmit = async ({ email, password }: FormData) => {
@@ -148,9 +146,6 @@ export default function SignUp() {
           </button>
         </div>
 
-        <div className="mt-6 text-center text-sm text-gray-500 font-[family-name:var(--font-geist-mono)]">
-          <a href="#" className="hover:underline">Forget Password?</a>
-        </div>
 
         <div className="mt-2 text-center text-sm text-gray-600 font-[family-name:var(--font-geist-mono)]">
           Already have an account?{' '}

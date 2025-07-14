@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { SupabaseVectorStore } from '@langchain/community/vectorstores/supabase'
 import { OpenAIEmbeddings, ChatOpenAI } from '@langchain/openai'
@@ -10,8 +10,8 @@ const bodySchema = z.object({
   message: z.string().min(1),
 })
 
-export async function POST(req: Request, context: { params: { chatId: string } }) {
-  const chatId = context.params.chatId
+export async function POST(req: NextRequest) {
+   const chatId = req.nextUrl.pathname.split('/').at(-2);
   const json = await req.json()
   const body = bodySchema.safeParse(json)
 
@@ -55,7 +55,7 @@ export async function POST(req: Request, context: { params: { chatId: string } }
     return NextResponse.json({ assistantMessage: apologyMessage, sources: [] })
   }
 
-  const contextText  = relevantDocs.map(doc => doc.pageContent).join('\n\n')
+  const contextText = relevantDocs.map(doc => doc.pageContent).join('\n\n')
 
   const prompt = PromptTemplate.fromTemplate(
     `You are an AI assistant. Use only the following context to answer the question.
@@ -81,21 +81,21 @@ Question: {question}`
   console.log(contextText)
 
 
-await supabase.from('messages').insert({
-  chat_id: chatId,
-  content: assistantMessage,
-  role: 'assistant',
-  sources: relevantDocs
-  .map(doc => doc.pageContent?.trim())
-  .filter(Boolean)
+  await supabase.from('messages').insert({
+    chat_id: chatId,
+    content: assistantMessage,
+    role: 'assistant',
+    sources: relevantDocs
+      .map(doc => doc.pageContent?.trim())
+      .filter(Boolean)
 
-})
+  })
 
   return NextResponse.json({
     assistantMessage,
     sources: relevantDocs
-  .map(doc => doc.pageContent?.trim())
-  .filter(Boolean)
+      .map(doc => doc.pageContent?.trim())
+      .filter(Boolean)
 
 
   })

@@ -42,10 +42,10 @@ isAuthPage = ['/', '/login', '/signup'].includes(
           ) : (
             <>
               <Link href="/signup">
-                <button className="bg-black text-white px-4 py-2 rounded">Get Started</button>
+                <button className="cursor-pointer bg-black text-white px-4 py-2 rounded">Get Started</button>
               </Link>
               <Link href="/login">
-                <button className="bg-white/20 text-black px-4 py-2 rounded">Login</button>
+                <button className="cursor-pointer bg-white/20 text-black px-4 py-2 rounded">Login</button>
               </Link>
             </>
           )}

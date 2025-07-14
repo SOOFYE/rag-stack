@@ -5,12 +5,6 @@ import { createSupabaseServerClient } from '../../../../utils/supabase/server'
 export async function GET() {
   const supabase = await createSupabaseServerClient()
 
-  const {
-  data: { user },
-} = await supabase.auth.getUser()
-
-console.log('User:', user)
-
   const { data, error } = await supabase
     .from('chats')
     .select('*')
