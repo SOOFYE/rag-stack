@@ -66,7 +66,7 @@ try {
   //Insert into `document_chunks_vector`
 const inserts = contents.map((chunk, i) => ({
   object_name: job.data.objectName,
-  chunk_text: chunk.replace(/\u0000/g, ''), // remove null characters
+  chunk_text: chunk.replace(/\u0000/g, ''), 
   embedding: embeddings[i],
 }))
 

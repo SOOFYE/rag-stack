@@ -1,7 +1,7 @@
 'use client'
 
 import { useSearchParams, useRouter } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
@@ -97,7 +97,7 @@ export default function ChatViewPage() {
   }
 
   return (
-    <div className="flex flex-col  max-w-4xl mx-auto px-4 pt-6">
+    <Suspense fallback={<div>Loading chat...</div>}><div className="flex flex-col  max-w-4xl mx-auto px-4 pt-6">
       <div className="flex-1 overflow-y-auto space-y-6 pb-32">
         {messages.map((msg) => (
           <div
@@ -198,6 +198,6 @@ export default function ChatViewPage() {
           </button>
         </div>
       </div>
-    </div>
+    </div></Suspense>
   )
 }

@@ -27,7 +27,9 @@ export async function updateSession(request: NextRequest) {
 
   const isProtectedPage = pathname.startsWith('/chat')
   const isPublicOnlyPage = ['/', '/login', '/signup'].includes(pathname)
-  const isApiRoute = pathname.startsWith('/api')
+   const isApiRoute =
+    pathname.startsWith('/api') &&
+    !['/api/auth/login', '/api/auth/signup', '/api/auth/callback'].includes(pathname)
 
   if (isProtectedPage && !user) {
     const loginUrl = request.nextUrl.clone()

@@ -1,9 +1,8 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '../../../../../../utils/supabase/server'
 
-export async function GET(req: Request, context: { params: { chatId: string } }) {
-   const { params } =  context;
-    const chatId = params.chatId;
+export async function GET(req: NextRequest) {
+   const chatId = req.nextUrl.pathname.split('/').at(-2);
   const supabase = await createSupabaseServerClient()
   const { data: messages, error } = await supabase
     .from('messages')
