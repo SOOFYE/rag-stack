@@ -24,7 +24,7 @@ RUN npm install
 COPY . .
 
 # Expose Next.js dev port
-EXPOSE 3000
+EXPOSE 3000 3001
 
 # Start the dev server for web, socket, and worker in parallel
 CMD ["sh", "-c", "npm run dev & npm run start:worker & npm run start:socket && wait"]
